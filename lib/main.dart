@@ -7,7 +7,16 @@ import 'package:web_practice/screens/main_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  //ref. https://stackoverflow.com/questions/70232931/firebaseoptions-cannot-be-null-when-creating-the-default-app
+  await Firebase.initializeApp(
+      options: FirebaseOptions(
+    apiKey: "AIzaSyCOuqU7kTqHJk4K3jpbb9xPB1tl1XxtERg",
+    appId: "1:406999155030:web:31cbb9a549eeba1b3f56f7",
+    messagingSenderId: "406999155030",
+    projectId: "flutter-web-128a1",
+    authDomain: "flutter-web-128a1.firebaseapp.com",
+    // storageBucket: "flutter-web-128a1.appspot.com",
+  ));
   runApp(const MyApp());
 }
 
@@ -36,22 +45,22 @@ class GetInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('diaries').snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Something went wrong'));
           }
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator.adaptive());
           }
-          return ListView(
-              children: snapshot.data!.docs.map((DocumentSnapshot doc) {
-            // Map<String, dynamic> data =
-            //     document.data()! as Map<String, dynamic>;
-            return ListTile(
-              title: Text(doc.get('display_name')),
-              subtitle: Text(doc.get('profession')),
-            );
-          }).toList());
+          return Material(
+            child: ListView(
+                children: snapshot.data!.docs
+                    .map((DocumentSnapshot doc) => ListTile(
+                          title: Text(doc.get('display_name')),
+                          subtitle: Text(doc.get('profession')),
+                        ))
+                    .toList()),
+          );
         });
   }
 }
