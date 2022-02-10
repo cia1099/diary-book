@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
+import 'package:web_practice/screens/login_page.dart';
 
 import 'package:web_practice/screens/main_page.dart';
+
+import 'screens/get_started_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +18,7 @@ void main() async {
     messagingSenderId: "406999155030",
     projectId: "flutter-web-128a1",
     authDomain: "flutter-web-128a1.firebaseapp.com",
-    // storageBucket: "flutter-web-128a1.appspot.com",
+    storageBucket: "flutter-web-128a1.appspot.com",
   ));
   runApp(const MyApp());
 }
@@ -33,7 +36,7 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
         primarySwatch: Colors.green,
       ),
-      home: GetInfo(),
+      home: LoginPage(),
     );
   }
 }

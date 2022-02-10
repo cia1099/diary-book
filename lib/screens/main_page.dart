@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:web_practice/model/user.dart';
+import 'package:web_practice/widgets/create_profile.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -57,40 +61,22 @@ class _MainPageState extends State<MainPage> {
                 ),
               ),
               //TODO: create profile
-              Container(
-                child: Row(
-                  children: [
-                    Column(
-                      children: const [
-                        Expanded(
-                          child: InkWell(
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: CircleAvatar(
-                                radius: 30,
-                                backgroundImage: NetworkImage(
-                                    'https://picsum.photos/200/300'),
-                                backgroundColor: Colors.transparent,
-                              ),
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'James',
-                          style: TextStyle(color: Colors.grey),
-                        )
-                      ],
-                    ),
-                    IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.logout_outlined,
-                          size: 19,
-                          color: Colors.redAccent,
-                        ))
-                  ],
-                ),
-              )
+              StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('users').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return CircularProgressIndicator.adaptive();
+
+                  final usersListStream = snapshot.data!.docs
+                      .map((doc) => MUser.fromDocument(doc))
+                      .where((user) =>
+                          user.uid == FirebaseAuth.instance.currentUser!.uid)
+                      .toList();
+                  final curUser = usersListStream[0];
+                  return CreateProfile(currentUser: curUser);
+                },
+              ),
             ],
           )
         ],
@@ -116,7 +102,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(48.0),
+                      padding: const EdgeInsets.all(38.0),
                       child: Card(
                           elevation: 4,
                           child: TextButton.icon(
