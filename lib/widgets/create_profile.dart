@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:web_practice/model/user.dart';
+import 'package:web_practice/screens/login_page.dart';
+import 'package:web_practice/widgets/update_user_profile_dialog.dart';
 
 class CreateProfile extends StatelessWidget {
   const CreateProfile({
@@ -11,6 +14,9 @@ class CreateProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _avatarUrlTextController =
+        TextEditingController(text: currentUser.avatarUrl);
+    final _nameTextController = TextEditingController(text: currentUser.name);
     return Container(
       child: Row(
         children: [
@@ -29,35 +35,10 @@ class CreateProfile extends StatelessWidget {
                   onTap: () {
                     showDialog(
                         context: context,
-                        builder: (context) => AlertDialog(
-                              content: Container(
-                                width: MediaQuery.of(context).size.width * 0.40,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.40,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      'Editing ${currentUser.name}',
-                                      style:
-                                          Theme.of(context).textTheme.headline5,
-                                    ),
-                                    SizedBox(
-                                      height: 30,
-                                    ),
-                                    SizedBox(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.50,
-                                      child: Form(
-                                        child: Column(
-                                          children: [],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ));
+                        builder: (context) => UpdateUserProfileDialog(
+                            currentUser: currentUser,
+                            avatarUrlTextController: _avatarUrlTextController,
+                            nameTextController: _nameTextController));
                   },
                 ),
               ),
@@ -68,7 +49,13 @@ class CreateProfile extends StatelessWidget {
             ],
           ),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                FirebaseAuth.instance.signOut().then((value) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginPage(),
+                    )));
+              },
               icon: const Icon(
                 Icons.logout_outlined,
                 size: 19,
