@@ -28,7 +28,7 @@ class CreateProfile extends StatelessWidget {
                     padding: EdgeInsets.all(8.0),
                     child: CircleAvatar(
                       radius: 30,
-                      backgroundImage: NetworkImage(currentUser.avatarUrl!),
+                      backgroundImage: NetworkImage(currentUser.avatarUrl),
                       backgroundColor: Colors.transparent,
                     ),
                   ),
@@ -43,7 +43,7 @@ class CreateProfile extends StatelessWidget {
                 ),
               ),
               Text(
-                currentUser.name!,
+                currentUser.name,
                 style: TextStyle(color: Colors.grey),
               )
             ],

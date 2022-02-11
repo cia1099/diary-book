@@ -2,12 +2,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MUser {
   final String? id;
-  final String? uid;
-  final String? name;
-  final String? profession;
-  final String? avatarUrl;
+  final String uid;
+  final String name;
+  final String profession;
+  final String avatarUrl;
 
-  MUser({this.id, this.uid, this.name, this.profession, this.avatarUrl});
+  MUser(
+      {this.id,
+      required this.uid,
+      required this.name,
+      required this.profession,
+      required this.avatarUrl});
 
   factory MUser.fromDocument(QueryDocumentSnapshot data) {
     return MUser(
