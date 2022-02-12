@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:web_practice/model/diary.dart';
 import 'package:web_practice/model/user.dart';
 import 'package:web_practice/widgets/create_profile.dart';
+import 'package:web_practice/widgets/diary_list_view.dart';
+import 'package:web_practice/widgets/write_diary_dialog.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -14,10 +17,13 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   String? _dropDownText;
+  DateTime selectedDate = DateTime.now();
 
   get onSelectionChanged => null;
   @override
   Widget build(BuildContext context) {
+    final _titleTextController = TextEditingController();
+    final _descriptionTextController = TextEditingController();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
@@ -97,7 +103,10 @@ class _MainPageState extends State<MainPage> {
                       padding: const EdgeInsets.all(38.0),
                       child: SfDateRangePicker(
                         onSelectionChanged: (dateRangePickerSelection) {
-                          print(dateRangePickerSelection.value.toString());
+                          setState(() {
+                            selectedDate = dateRangePickerSelection.value;
+                          });
+                          // print(dateRangePickerSelection.value.toString());
                         },
                       ),
                     ),
@@ -106,7 +115,6 @@ class _MainPageState extends State<MainPage> {
                       child: Card(
                           elevation: 4,
                           child: TextButton.icon(
-                            onPressed: () {},
                             icon: Icon(
                               Icons.add,
                               size: 40,
@@ -119,42 +127,22 @@ class _MainPageState extends State<MainPage> {
                                 style: TextStyle(fontSize: 17),
                               ),
                             ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => WriteDiaryDialog(
+                                    selectedDate: selectedDate,
+                                    titleTextController: _titleTextController,
+                                    descriptionTextController:
+                                        _descriptionTextController),
+                              );
+                            },
                           )),
                     ),
                   ],
                 ),
               )),
-          Expanded(
-              flex: 3,
-              child: Container(
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    Expanded(
-                        child: Container(
-                      child: Column(
-                        children: [
-                          Expanded(
-                              child: ListView.builder(
-                                  itemCount: 5,
-                                  itemBuilder: (ctx, i) {
-                                    return SizedBox(
-                                      width:
-                                          MediaQuery.of(ctx).size.width * 0.4,
-                                      child: Card(
-                                        elevation: 4,
-                                        child: ListTile(
-                                          title: Text('Hello'),
-                                        ),
-                                      ),
-                                    );
-                                  }))
-                        ],
-                      ),
-                    )),
-                  ],
-                ),
-              )),
+          Expanded(flex: 3, child: DiaryListView()),
         ],
       ),
       floatingActionButton: FloatingActionButton(
