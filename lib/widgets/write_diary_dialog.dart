@@ -93,9 +93,9 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                                         Timestamp.fromDate(widget.selectedDate))
                                 .toMap())
                             .then((value) {
-                          setState(() {
-                            docId = value.id;
-                          });
+                          // setState(() {
+                          docId = value.id;
+                          // });
                           return null;
                         });
                       }
@@ -111,7 +111,7 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                             .putData(_fileBytes!, metadata)
                             .then((p0) => p0.ref.getDownloadURL().then(
                                 (value) => diaryCollectionReference
-                                    .doc(docId)
+                                    .doc(docId!)
                                     .update(
                                         {'photo_lists': value.toString()})));
                       }

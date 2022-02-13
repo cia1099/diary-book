@@ -140,7 +140,7 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
               )),
-          Expanded(flex: 3, child: DiaryListView()),
+          Expanded(flex: 3, child: DiaryListView(selectedDate: selectedDate)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
