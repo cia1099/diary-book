@@ -1,7 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:intl/intl.dart';
+import 'package:mime_type/mime_type.dart';
+import 'dart:html' as html;
+import 'package:path/path.dart' as Path;
+
 import 'package:web_practice/model/diary.dart';
 
 class WriteDiaryDialog extends StatefulWidget {
@@ -26,6 +32,10 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
   var _buttonText = 'Done';
   CollectionReference diaryCollectionReference =
       FirebaseFirestore.instance.collection('diaries');
+  html.File? _cloudFile;
+  var _fileBytes;
+  Image? _imageWidget;
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -59,21 +69,51 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                             ),
                             side: BorderSide(color: Colors.green, width: 1))),
                     onPressed: () {
+                      final fs = firebase_storage.FirebaseStorage.instance;
+                      final dateTime = DateTime.now();
+                      final path = '$dateTime';
+
                       final _fieldsNotEmpty =
                           widget._titleTextController.text.isNotEmpty &&
                               widget._descriptionTextController.text.isNotEmpty;
+                      String? docId;
                       if (_fieldsNotEmpty) {
-                        diaryCollectionReference.add(Diary(
-                                title: widget._titleTextController.text,
-                                entry: widget._descriptionTextController.text,
-                                author: FirebaseAuth
-                                    .instance.currentUser!.email!
-                                    .split('@')[0],
-                                userId: FirebaseAuth.instance.currentUser!.uid,
-                                photoUrls: '',
-                                entryTime:
-                                    Timestamp.fromDate(widget.selectedDate))
-                            .toMap());
+                        diaryCollectionReference
+                            .add(Diary(
+                                    title: widget._titleTextController.text,
+                                    entry:
+                                        widget._descriptionTextController.text,
+                                    author: FirebaseAuth
+                                        .instance.currentUser!.email!
+                                        .split('@')[0],
+                                    userId:
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                    photoUrls: '',
+                                    entryTime:
+                                        Timestamp.fromDate(widget.selectedDate))
+                                .toMap())
+                            .then((value) {
+                          setState(() {
+                            docId = value.id;
+                          });
+                          return null;
+                        });
+                      }
+                      if (_fileBytes != null) {
+                        final metadata = firebase_storage.SettableMetadata(
+                            contentType: 'image/jpeg',
+                            customMetadata: {'picked-file-path': path});
+
+                        fs
+                            .ref()
+                            .child(
+                                'images/$path${FirebaseAuth.instance.currentUser!.uid}')
+                            .putData(_fileBytes!, metadata)
+                            .then((p0) => p0.ref.getDownloadURL().then(
+                                (value) => diaryCollectionReference
+                                    .doc(docId)
+                                    .update(
+                                        {'photo_lists': value.toString()})));
                       }
                       setState(() {
                         _buttonText = 'Saving...';
@@ -100,7 +140,9 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                           IconButton(
                             icon: Icon(Icons.image_rounded),
                             splashRadius: 26,
-                            onPressed: () {},
+                            onPressed: () async {
+                              await getMultipleImageInfos();
+                            },
                           )
                         ],
                       ),
@@ -122,11 +164,7 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                                   height: MediaQuery.of(context).size.height *
                                       0.8 /
                                       2,
-                                  child: Container(
-                                    color: Colors.green,
-                                    width: 700,
-                                    child: Text('image here'),
-                                  ),
+                                  child: _imageWidget,
                                 ),
                                 TextFormField(
                                   controller: widget._titleTextController,
@@ -151,5 +189,18 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
         ),
       ),
     );
+  }
+
+  Future<void> getMultipleImageInfos() async {
+    var mediaData = await ImagePickerWeb.getImageInfo;
+    // String? mimeType = mime(Path.basename(mediaData.fileName!));
+    // html.File mediaFile =
+    //     html.File(mediaData.data!, mediaData.fileName!, {'type': mimeType});
+
+    setState(() {
+      // _cloudFile = mediaFile;
+      _fileBytes = mediaData.data;
+      _imageWidget = Image.memory(mediaData.data!);
+    });
   }
 }

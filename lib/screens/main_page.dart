@@ -127,16 +127,14 @@ class _MainPageState extends State<MainPage> {
                                 style: TextStyle(fontSize: 17),
                               ),
                             ),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => WriteDiaryDialog(
-                                    selectedDate: selectedDate,
-                                    titleTextController: _titleTextController,
-                                    descriptionTextController:
-                                        _descriptionTextController),
-                              );
-                            },
+                            onPressed: () => showDialog(
+                              context: context,
+                              builder: (context) => WriteDiaryDialog(
+                                  selectedDate: selectedDate,
+                                  titleTextController: _titleTextController,
+                                  descriptionTextController:
+                                      _descriptionTextController),
+                            ),
                           )),
                     ),
                   ],
@@ -146,7 +144,12 @@ class _MainPageState extends State<MainPage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => showDialog(
+            context: context,
+            builder: (context) => WriteDiaryDialog(
+                selectedDate: selectedDate,
+                titleTextController: _titleTextController,
+                descriptionTextController: _descriptionTextController)),
         tooltip: 'Add',
         child: Icon(Icons.add),
       ),

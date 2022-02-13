@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:web_practice/model/diary.dart';
+import 'package:intl/intl.dart';
+import 'package:web_practice/util/utils.dart';
 
 class DiaryListView extends StatelessWidget {
   const DiaryListView({
@@ -21,32 +23,102 @@ class DiaryListView extends StatelessWidget {
             .where(
                 (item) => item.userId == FirebaseAuth.instance.currentUser!.uid)
             .toList();
-        return Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              Expanded(
-                  child: Column(
-                children: [
-                  Expanded(
-                      child: ListView.builder(
-                          itemCount: filterList.length,
-                          itemBuilder: (ctx, i) {
-                            final diary = filterList[i];
-                            return SizedBox(
-                              width: MediaQuery.of(ctx).size.width * 0.4,
-                              child: Card(
-                                elevation: 4,
-                                child: ListTile(
-                                  title: Text(diary.title),
-                                ),
+        return Column(
+          children: [
+            Expanded(
+                child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              child: ListView.builder(
+                  itemCount: filterList.length,
+                  itemBuilder: (ctx, i) {
+                    final diary = filterList[i];
+                    return Card(
+                      elevation: 4,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            title: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    formatDateFromTimestamp(diary.entryTime),
+                                    style: TextStyle(
+                                        color: Colors.blueGrey,
+                                        fontSize: 19,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  TextButton.icon(
+                                      onPressed: () {},
+                                      icon: Icon(
+                                        Icons.delete_forever,
+                                        color: Colors.grey,
+                                      ),
+                                      label: Text(''))
+                                ],
                               ),
-                            );
-                          }))
-                ],
-              )),
-            ],
-          ),
+                            ),
+                            subtitle: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '•' +
+                                          fromDateFromTimestampHour(
+                                              diary.entryTime),
+                                      style: TextStyle(color: Colors.green),
+                                    ),
+                                    TextButton.icon(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.more_horiz,
+                                            color: Colors.grey),
+                                        label: Text('')),
+                                  ],
+                                ),
+                                Image.network(diary.photoUrls.isEmpty
+                                    ? 'https://picsum.photos/400/200'
+                                    : diary.photoUrls),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              diary.title,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              diary.entry,
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+            ))
+          ],
         );
       },
     );
