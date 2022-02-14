@@ -151,38 +151,43 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                       width: 50,
                     ),
                     Expanded(
+                        flex: 3,
                         child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(DateFormat.yMMMd().format(widget.selectedDate)),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: Form(
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      0.8 /
-                                      2,
-                                  child: _imageWidget,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                DateFormat.yMMMd().format(widget.selectedDate)),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: Form(
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.8 /
+                                              2,
+                                      child: _imageWidget,
+                                    ),
+                                    TextFormField(
+                                      controller: widget._titleTextController,
+                                      decoration:
+                                          InputDecoration(hintText: 'Title...'),
+                                    ),
+                                    TextFormField(
+                                      maxLines: null,
+                                      controller:
+                                          widget._descriptionTextController,
+                                      decoration: InputDecoration(
+                                          hintText:
+                                              'Write your thought here...'),
+                                    ),
+                                  ],
                                 ),
-                                TextFormField(
-                                  controller: widget._titleTextController,
-                                  decoration:
-                                      InputDecoration(hintText: 'Title...'),
-                                ),
-                                TextFormField(
-                                  maxLines: null,
-                                  controller: widget._descriptionTextController,
-                                  decoration: InputDecoration(
-                                      hintText: 'Write your thought here...'),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ))
+                              ),
+                            )
+                          ],
+                        ))
                   ],
                 ))
           ],

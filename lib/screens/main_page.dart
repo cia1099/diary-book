@@ -98,6 +98,7 @@ class _MainPageState extends State<MainPage> {
                     border: Border(
                         right: BorderSide(width: 0.4, color: Colors.blueGrey))),
                 child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(38.0),
@@ -110,8 +111,9 @@ class _MainPageState extends State<MainPage> {
                         },
                       ),
                     ),
+                    const Expanded(child: SizedBox()),
                     Padding(
-                      padding: const EdgeInsets.all(38.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 48),
                       child: Card(
                           elevation: 4,
                           child: TextButton.icon(
@@ -136,6 +138,9 @@ class _MainPageState extends State<MainPage> {
                                       _descriptionTextController),
                             ),
                           )),
+                    ),
+                    SizedBox(
+                      height: 18,
                     ),
                   ],
                 ),

@@ -29,15 +29,7 @@ class DeleteEntryDialog extends StatelessWidget {
             onPressed: () => bookCollectionReference
                 .doc(diary.id)
                 .delete()
-                .then((value) => Navigator.of(context).pop(true)
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder:
-                    //           (context) =>
-                    //               MainPage(),
-                    //     ))
-                    ),
+                .then((value) => Navigator.of(context).pop(true)),
             child: const Text('Delete'))
       ],
     );

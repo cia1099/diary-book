@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:web_practice/model/diary.dart';
 import 'package:web_practice/util/utils.dart';
+import 'package:web_practice/widgets/update_entry_dialog.dart';
 
 import 'delete_entry_dialog.dart';
 
@@ -19,6 +20,8 @@ class InnerListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final _titleTextController = TextEditingController(text: diary.title);
+    final _descriptionTextController = TextEditingController(text: diary.entry);
     return Column(
       children: [
         ListTile(
@@ -116,8 +119,17 @@ class InnerListCard extends StatelessWidget {
                         IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
-                            // showDialog(context: context, builder: (context) => UpdateUserProfileDialog(currentUser: currentUser, avatarUrlTextController: avatarUrlTextController, nameTextController: nameTextController),)
-                            Navigator.of(context).pop();
+                            showDialog(
+                              context: context,
+                              builder: (context) => UpdateEntryDialog(
+                                diary: diary,
+                                titleTextController: _titleTextController,
+                                descriptionTextController:
+                                    _descriptionTextController,
+                                linkReference: bookCollectionReference,
+                              ),
+                            );
+                            // Navigator.of(context).pop();
                           },
                         ),
                         IconButton(
