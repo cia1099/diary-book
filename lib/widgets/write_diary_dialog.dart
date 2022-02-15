@@ -9,6 +9,7 @@ import 'dart:html' as html;
 import 'package:path/path.dart' as Path;
 
 import 'package:web_practice/model/diary.dart';
+import 'package:web_practice/model/user.dart';
 
 class WriteDiaryDialog extends StatefulWidget {
   const WriteDiaryDialog({
@@ -68,7 +69,15 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                               Radius.circular(15),
                             ),
                             side: BorderSide(color: Colors.green, width: 1))),
-                    onPressed: () {
+                    onPressed: () async {
+                      final user = FirebaseFirestore.instance
+                          .collection('users')
+                          .where('uid',
+                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                          .get()
+                          .then((value) => value.docs
+                              .map((data) => MUser.fromDocument(data)))
+                          .then((value) => value.first);
                       final fs = firebase_storage.FirebaseStorage.instance;
                       final dateTime = DateTime.now();
                       final path = '$dateTime';
@@ -83,11 +92,15 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                                     title: widget._titleTextController.text,
                                     entry:
                                         widget._descriptionTextController.text,
-                                    author: FirebaseAuth
-                                        .instance.currentUser!.email!
-                                        .split('@')[0],
+                                    author:
+                                        await user.then((value) => value.name),
+                                    // author: FirebaseAuth
+                                    //     .instance.currentUser!.email!
+                                    //     .split('@')[0],
                                     userId:
-                                        FirebaseAuth.instance.currentUser!.uid,
+                                        await user.then((value) => value.uid),
+                                    // userId:
+                                    //     FirebaseAuth.instance.currentUser!.uid,
                                     photoUrls: '',
                                     entryTime:
                                         Timestamp.fromDate(widget.selectedDate))

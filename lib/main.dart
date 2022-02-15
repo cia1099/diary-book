@@ -1,7 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
+import 'package:web_practice/model/diary.dart';
 import 'package:web_practice/screens/login_page.dart';
 
 import 'package:web_practice/screens/main_page.dart';
@@ -29,14 +32,28 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        primarySwatch: Colors.green,
+    final userDiaryDataStream = FirebaseFirestore.instance
+        .collection('diaries')
+        .snapshots()
+        .map((snap) =>
+            snap.docs.map((docs) => Diary.fromDocument(docs)).toList());
+    return MultiProvider(
+      providers: [
+        StreamProvider(
+            create: (context) => FirebaseAuth.instance.authStateChanges(),
+            initialData: null),
+        StreamProvider<List<Diary>>(
+            create: (context) => userDiaryDataStream, initialData: [])
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          primarySwatch: Colors.green,
+        ),
+        home: LoginPage(),
       ),
-      home: LoginPage(),
     );
   }
 }

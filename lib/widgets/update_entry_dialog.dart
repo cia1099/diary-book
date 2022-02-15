@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 
 import 'package:web_practice/model/diary.dart';
+import 'package:web_practice/model/user.dart';
 import 'package:web_practice/screens/main_page.dart';
 import 'package:web_practice/util/utils.dart';
 import 'package:mime_type/mime_type.dart';
@@ -70,7 +71,16 @@ class _UpdateEntryDialogState extends State<UpdateEntryDialog> {
                       ),
                     ),
                     onPressed: () async {
-                      final user = FirebaseAuth.instance.currentUser!;
+                      // final user = FirebaseAuth.instance.currentUser!;
+                      final user = FirebaseFirestore.instance
+                          .collection('users')
+                          .where('uid',
+                              isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                          .get()
+                          .then((value) => value.docs
+                              .map((data) => MUser.fromDocument(data)))
+                          .then((value) => value.first);
+
                       final fieldNotEmpty =
                           widget._titleTextController.text.isNotEmpty &&
                               widget._descriptionTextController.text.isNotEmpty;
@@ -95,21 +105,16 @@ class _UpdateEntryDialogState extends State<UpdateEntryDialog> {
 
                           final task = await fs
                               .ref()
-                              .child('images/$path${user.uid}')
+                              .child(
+                                  'images/$path${await user.then((value) => value.uid)}')
                               .putData(_fileBytes!, metadata);
                           newUrl = await task.ref.getDownloadURL();
-
-                          // .then((p0) => p0.ref.getDownloadURL().then(
-                          //     (value) => widget._linkReference
-                          //         .doc(widget.diary.id)
-                          //         .update(
-                          //             {'photo_lists': value.toString()})));
                         }
 
                         widget._linkReference.doc(widget.diary.id).update(Diary(
-                              userId: user.uid,
+                              userId: await user.then((value) => value.uid),
                               title: widget._titleTextController.text,
-                              author: user.email!.split('@')[0],
+                              author: await user.then((value) => value.name),
                               entryTime: Timestamp.fromDate(DateTime.now()),
                               photoUrls: newUrl ?? widget.diary.photoUrls,
                               entry: widget._descriptionTextController.text,

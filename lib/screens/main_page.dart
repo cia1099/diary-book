@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:web_practice/model/diary.dart';
 import 'package:web_practice/model/user.dart';
+import 'package:web_practice/services/service.dart';
 import 'package:web_practice/widgets/create_profile.dart';
 import 'package:web_practice/widgets/diary_list_view.dart';
 import 'package:web_practice/widgets/write_diary_dialog.dart';
@@ -17,11 +19,23 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   String? _dropDownText;
-  DateTime selectedDate = DateTime.now();
+  DateTime? selectedDate; // = DateTime.now();
+  var userDiaryFilterEntriesList;
+  // final _listOfDiaries = <Diary>[]
 
   get onSelectionChanged => null;
   @override
   Widget build(BuildContext context) {
+    final _listOfDiaries = context
+        .watch<List<Diary>>()
+        .where((diary) => selectedDate == null
+            ? DateTime.now().isAfter(diary.entryTime.toDate())
+            : selectedDate!
+                    .add(const Duration(days: 1))
+                    .isAfter(diary.entryTime.toDate()) &&
+                selectedDate!.isBefore(diary.entryTime.toDate()))
+        .toList();
+    //final _listOfDiaries = Provider.of<List<Diary>>(context);
     final _titleTextController = TextEditingController();
     final _descriptionTextController = TextEditingController();
     return Scaffold(
@@ -103,9 +117,24 @@ class _MainPageState extends State<MainPage> {
                     Padding(
                       padding: const EdgeInsets.all(38.0),
                       child: SfDateRangePicker(
+                        toggleDaySelection: true,
                         onSelectionChanged: (dateRangePickerSelection) {
                           setState(() {
                             selectedDate = dateRangePickerSelection.value;
+                            // if (selectedDate != null) {
+                            //   _listOfDiaries.clear();
+                            //   userDiaryFilterEntriesList = DiaryService()
+                            //       .getSameDateDiary(
+                            //           Timestamp.fromDate(selectedDate!)
+                            //               .toDate(),
+                            //           FirebaseAuth.instance.currentUser!.uid)
+                            //       .then((items) {
+                            //     for (var element in items) {
+                            //       _listOfDiaries.add(element);
+                            //     }
+                            //     setState(() {});
+                            //   });
+                            // }
                           });
                           // print(dateRangePickerSelection.value.toString());
                         },
@@ -132,7 +161,7 @@ class _MainPageState extends State<MainPage> {
                             onPressed: () => showDialog(
                               context: context,
                               builder: (context) => WriteDiaryDialog(
-                                  selectedDate: selectedDate,
+                                  selectedDate: selectedDate ?? DateTime.now(),
                                   titleTextController: _titleTextController,
                                   descriptionTextController:
                                       _descriptionTextController),
@@ -145,14 +174,18 @@ class _MainPageState extends State<MainPage> {
                   ],
                 ),
               )),
-          Expanded(flex: 3, child: DiaryListView(selectedDate: selectedDate)),
+          Expanded(
+              flex: 3,
+              child: DiaryListView(
+                  selectedDate: selectedDate ?? DateTime.now(),
+                  listOfDiaries: _listOfDiaries)),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog(
             context: context,
             builder: (context) => WriteDiaryDialog(
-                selectedDate: selectedDate,
+                selectedDate: selectedDate ?? DateTime.now(),
                 titleTextController: _titleTextController,
                 descriptionTextController: _descriptionTextController)),
         tooltip: 'Add',
