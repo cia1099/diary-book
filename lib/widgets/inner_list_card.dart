@@ -11,11 +11,9 @@ class InnerListCard extends StatelessWidget {
     Key? key,
     required this.diary,
     required this.bookCollectionReference,
-    required this.selectedDate,
   }) : super(key: key);
 
   final Diary diary;
-  final DateTime selectedDate;
   final CollectionReference<Map<String, dynamic>> bookCollectionReference;
 
   @override

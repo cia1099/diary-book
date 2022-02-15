@@ -32,16 +32,19 @@ class DiaryService {
     userCollectionReference.doc(user.id).update(updateUser.toMap());
   }
 
-  Future<List<Diary>> getSameDateDiary(DateTime first, String userId) async {
-    return diaryCollectionReference
-        .where('entry_time',
-            isGreaterThanOrEqualTo: Timestamp.fromDate(first).toDate())
-        .where('entry_time',
-            isLessThan:
-                Timestamp.fromDate(first.add(const Duration(days: 1))).toDate())
-        .where('user_id', isEqualTo: userId)
-        .get()
-        .then((value) =>
-            value.docs.map((diary) => Diary.fromDocument(diary)).toList());
+  Future<List<Diary>> getSameDateDiary(DateTime? first, String userId) async {
+    var query = first != null
+        ? diaryCollectionReference
+            .where('entry_time',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(first).toDate())
+            .where('entry_time',
+                isLessThan:
+                    Timestamp.fromDate(first.add(const Duration(days: 1)))
+                        .toDate())
+        : diaryCollectionReference.where('entry_time',
+            isLessThan: DateTime.now());
+
+    return query.where('user_id', isEqualTo: userId).get().then((value) =>
+        value.docs.map((diary) => Diary.fromDocument(diary)).toList());
   }
 }

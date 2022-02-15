@@ -6,6 +6,7 @@ import 'package:web_practice/model/diary.dart';
 import 'package:intl/intl.dart';
 import 'package:web_practice/model/user.dart';
 import 'package:web_practice/screens/main_page.dart';
+import 'package:web_practice/services/service.dart';
 import 'package:web_practice/util/utils.dart';
 import 'package:web_practice/widgets/delete_entry_dialog.dart';
 import 'package:web_practice/widgets/update_user_profile_dialog.dart';
@@ -14,13 +15,13 @@ import 'package:web_practice/widgets/write_diary_dialog.dart';
 import 'inner_list_card.dart';
 
 class DiaryListView extends StatelessWidget {
-  const DiaryListView({
+  DiaryListView({
     Key? key,
-    required this.selectedDate,
-    required this.listOfDiaries,
+    // required this.listOfDiaries,
+    this.selectedDate,
   }) : super(key: key);
-  final DateTime selectedDate;
-  final List<Diary> listOfDiaries;
+  DateTime? selectedDate;
+  // final List<Diary> listOfDiaries;
 
   @override
   Widget build(BuildContext context) {
@@ -29,68 +30,91 @@ class DiaryListView extends StatelessWidget {
 
     // final user = Provider.of<User?>(context);
     final user = context.watch<User?>();
-    final filteredDiaryList =
-        listOfDiaries.where((item) => item.userId == user!.uid).toList();
+    // final filteredDiaryList =
+    //     // listOfDiaries.where((item) => item.userId == user!.uid).toList();
+    //     DiaryService().getSameDateDiary(selectedDate, user!.uid);
     return Column(
       children: [
         Expanded(
             child: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.8,
-          child: filteredDiaryList.isNotEmpty
-              ? ListView.builder(
-                  itemCount: filteredDiaryList.length,
-                  itemBuilder: (ctx, i) {
-                    final diary = filteredDiaryList[i];
-                    return Card(
-                      elevation: 4,
-                      child: InnerListCard(
-                          selectedDate: this.selectedDate,
-                          diary: diary,
-                          bookCollectionReference: bookCollectionReference),
-                    );
-                  })
-              : ListView.builder(
-                  itemCount: 1,
-                  itemBuilder: (ctx, i) {
-                    // final diary = listOfDiaries[i];
-                    return Card(
-                      elevation: 4,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            height: MediaQuery.of(context).size.height * 0.2,
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Safeguard your memory on ${formatDate(selectedDate)}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyText2,
-                                  ),
-                                  TextButton.icon(
-                                      onPressed: () => showDialog(
-                                            context: context,
-                                            builder: (context) =>
-                                                WriteDiaryDialog(
-                                                    selectedDate: selectedDate,
-                                                    titleTextController:
-                                                        TextEditingController(),
-                                                    descriptionTextController:
-                                                        TextEditingController()),
-                                          ),
-                                      icon: Icon(Icons.lock_outline_sharp),
-                                      label: Text('Click to Add an Entry')),
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  }),
-        ))
+                width: MediaQuery.of(context).size.width * 0.8,
+                child: FutureBuilder<List<Diary>>(
+                  future: DiaryService().getSameDateDiary(
+                      selectedDate, FirebaseAuth.instance.currentUser!.uid),
+                  initialData: [],
+                  builder: (_, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                      return Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      );
+
+                    final filteredDiaryList = snapshot.data!;
+                    return filteredDiaryList.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: filteredDiaryList.length,
+                            itemBuilder: (_, i) {
+                              final diary = filteredDiaryList[i];
+                              return Card(
+                                elevation: 4,
+                                child: InnerListCard(
+                                    // selectedDate: this.selectedDate,
+                                    diary: diary,
+                                    bookCollectionReference:
+                                        bookCollectionReference),
+                              );
+                            })
+                        : ListView.builder(
+                            itemCount: 1,
+                            itemBuilder: (_, i) {
+                              // final diary = listOfDiaries[i];
+                              return Card(
+                                elevation: 4,
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.2,
+                                      child: Center(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Safeguard your memory on ${formatDate(selectedDate ?? DateTime.now())}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText2,
+                                            ),
+                                            TextButton.icon(
+                                                onPressed: () => showDialog(
+                                                      context: context,
+                                                      builder: (context) => WriteDiaryDialog(
+                                                          selectedDate:
+                                                              selectedDate ??
+                                                                  DateTime
+                                                                      .now(),
+                                                          titleTextController:
+                                                              TextEditingController(),
+                                                          descriptionTextController:
+                                                              TextEditingController()),
+                                                    ),
+                                                icon: Icon(
+                                                    Icons.lock_outline_sharp),
+                                                label: Text(
+                                                    'Click to Add an Entry')),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            });
+                  },
+                )))
       ],
     );
   }

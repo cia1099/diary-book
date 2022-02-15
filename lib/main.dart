@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:web_practice/model/diary.dart';
+import 'package:web_practice/model/global.dart';
 import 'package:web_practice/screens/login_page.dart';
 
 import 'package:web_practice/screens/main_page.dart';
@@ -43,7 +44,8 @@ class MyApp extends StatelessWidget {
             create: (context) => FirebaseAuth.instance.authStateChanges(),
             initialData: null),
         StreamProvider<List<Diary>>(
-            create: (context) => userDiaryDataStream, initialData: [])
+            create: (context) => userDiaryDataStream, initialData: []),
+        Provider<GlobalVariable>(create: (context) => GlobalVariable()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

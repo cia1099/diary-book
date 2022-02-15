@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:web_practice/model/diary.dart';
+import 'package:web_practice/model/global.dart';
 import 'package:web_practice/model/user.dart';
 import 'package:web_practice/services/service.dart';
 import 'package:web_practice/widgets/create_profile.dart';
@@ -23,19 +24,21 @@ class _MainPageState extends State<MainPage> {
   var userDiaryFilterEntriesList;
   // final _listOfDiaries = <Diary>[]
 
-  get onSelectionChanged => null;
   @override
   Widget build(BuildContext context) {
-    final _listOfDiaries = context
-        .watch<List<Diary>>()
-        .where((diary) => selectedDate == null
-            ? DateTime.now().isAfter(diary.entryTime.toDate())
-            : selectedDate!
-                    .add(const Duration(days: 1))
-                    .isAfter(diary.entryTime.toDate()) &&
-                selectedDate!.isBefore(diary.entryTime.toDate()))
-        .toList();
-    //final _listOfDiaries = Provider.of<List<Diary>>(context);
+    final globalVar = context.read<GlobalVariable>();
+    var selectedDate = globalVar.selectedTime;
+
+    // final _listOfDiaries = context
+    //     .watch<List<Diary>>()
+    //     .where((diary) => selectedDate == null
+    //         ? DateTime.now().isAfter(diary.entryTime.toDate())
+    //         : selectedDate!
+    //                 .add(const Duration(days: 1))
+    //                 .isAfter(diary.entryTime.toDate()) &&
+    //             selectedDate!.isBefore(diary.entryTime.toDate()))
+    //     .toList();
+    final _listOfDiaries = Provider.of<List<Diary>>(context);
     final _titleTextController = TextEditingController();
     final _descriptionTextController = TextEditingController();
     return Scaffold(
@@ -117,10 +120,13 @@ class _MainPageState extends State<MainPage> {
                     Padding(
                       padding: const EdgeInsets.all(38.0),
                       child: SfDateRangePicker(
+                        initialSelectedDate: selectedDate,
                         toggleDaySelection: true,
                         onSelectionChanged: (dateRangePickerSelection) {
                           setState(() {
-                            selectedDate = dateRangePickerSelection.value;
+                            // selectedDate = dateRangePickerSelection.value;
+                            globalVar.selectedTime =
+                                dateRangePickerSelection.value;
                             // if (selectedDate != null) {
                             //   _listOfDiaries.clear();
                             //   userDiaryFilterEntriesList = DiaryService()
@@ -177,8 +183,8 @@ class _MainPageState extends State<MainPage> {
           Expanded(
               flex: 3,
               child: DiaryListView(
-                  selectedDate: selectedDate ?? DateTime.now(),
-                  listOfDiaries: _listOfDiaries)),
+                selectedDate: selectedDate,
+              )),
         ],
       ),
       floatingActionButton: FloatingActionButton(
