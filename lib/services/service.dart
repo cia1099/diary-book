@@ -32,7 +32,8 @@ class DiaryService {
     userCollectionReference.doc(user.id).update(updateUser.toMap());
   }
 
-  Future<List<Diary>> getSameDateDiary(DateTime? first, String userId) async {
+  Future<List<Diary>> getSameDateDiary(DateTime? first, String userId,
+      [bool isDescend = true]) async {
     var query = first != null
         ? diaryCollectionReference
             .where('entry_time',
@@ -44,7 +45,29 @@ class DiaryService {
         : diaryCollectionReference.where('entry_time',
             isLessThan: DateTime.now());
 
-    return query.where('user_id', isEqualTo: userId).get().then((value) =>
-        value.docs.map((diary) => Diary.fromDocument(diary)).toList());
+    return query
+        .where('user_id', isEqualTo: userId)
+        .orderBy('entry_time', descending: isDescend)
+        .get()
+        .then((value) =>
+            value.docs.map((diary) => Diary.fromDocument(diary)).toList());
+  }
+
+  Future<List<Diary>> getLatestDiaries(String uid) async {
+    return diaryCollectionReference
+        .where('user_id', isEqualTo: uid)
+        .orderBy('entry_time', descending: true)
+        .get()
+        .then((value) =>
+            value.docs.map((doc) => Diary.fromDocument(doc)).toList());
+  }
+
+  Future<List<Diary>> getEarliestDiaries(String uid) async {
+    return diaryCollectionReference
+        .where('user_id', isEqualTo: uid)
+        .orderBy('entry_time', descending: false)
+        .get()
+        .then((value) =>
+            value.docs.map((doc) => Diary.fromDocument(doc)).toList());
   }
 }

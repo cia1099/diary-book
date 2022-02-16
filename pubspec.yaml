@@ -45,6 +45,7 @@ dependencies:
   mime_type: ^1.0.0
   universal_html: ^2.0.8
   provider: ^6.0.2
+  delayed_display: ^2.0.0
   
 
 dev_dependencies:

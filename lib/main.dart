@@ -9,6 +9,7 @@ import 'package:web_practice/model/global.dart';
 import 'package:web_practice/screens/login_page.dart';
 
 import 'package:web_practice/screens/main_page.dart';
+import 'package:web_practice/screens/page_not_found.dart';
 
 import 'screens/get_started_page.dart';
 
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
             snap.docs.map((docs) => Diary.fromDocument(docs)).toList());
     return MultiProvider(
       providers: [
-        StreamProvider(
+        StreamProvider<User?>(
             create: (context) => FirebaseAuth.instance.authStateChanges(),
             initialData: null),
         StreamProvider<List<Diary>>(
@@ -54,9 +55,40 @@ class MyApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           primarySwatch: Colors.green,
         ),
-        home: LoginPage(),
+        initialRoute: '/',
+        onGenerateRoute: (settings) => MaterialPageRoute(
+          builder: (context) => RouteController(settingName: settings.name!),
+        ),
+        onUnknownRoute: (settings) => MaterialPageRoute(
+          builder: (context) => PageNotFound(),
+        ),
+        // home: LoginPage(),
       ),
     );
+  }
+}
+
+class RouteController extends StatelessWidget {
+  const RouteController({Key? key, required this.settingName})
+      : super(key: key);
+  final String settingName;
+
+  @override
+  Widget build(BuildContext context) {
+    final isUserSignedIn = context.read<User?>() != null;
+
+    final signedInGotoMain =
+        isUserSignedIn && (settingName == '/main' || settingName == '/login');
+    final notSignedInGotoMain = !isUserSignedIn;
+    if (settingName == '/')
+      return GettingStartPage();
+    else if ((settingName == '/main' || settingName == '/login') &&
+        notSignedInGotoMain)
+      return LoginPage();
+    else if (signedInGotoMain)
+      return MainPage();
+    else
+      return PageNotFound();
   }
 }
 

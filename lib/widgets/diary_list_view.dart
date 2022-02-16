@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:web_practice/model/diary.dart';
 import 'package:intl/intl.dart';
+import 'package:delayed_display/delayed_display.dart';
+import 'package:web_practice/model/global.dart';
+
 import 'package:web_practice/model/user.dart';
 import 'package:web_practice/screens/main_page.dart';
 import 'package:web_practice/services/service.dart';
@@ -29,7 +32,8 @@ class DiaryListView extends StatelessWidget {
         FirebaseFirestore.instance.collection('diaries');
 
     // final user = Provider.of<User?>(context);
-    final user = context.watch<User?>();
+    // final user = context.read<User?>(); //listenning will cause bug when logout
+    final isDescend = context.read<GlobalVariable>().isDescend;
     // final filteredDiaryList =
     //     // listOfDiaries.where((item) => item.userId == user!.uid).toList();
     //     DiaryService().getSameDateDiary(selectedDate, user!.uid);
@@ -39,8 +43,8 @@ class DiaryListView extends StatelessWidget {
             child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.8,
                 child: FutureBuilder<List<Diary>>(
-                  future: DiaryService().getSameDateDiary(
-                      selectedDate, FirebaseAuth.instance.currentUser!.uid),
+                  future: DiaryService().getSameDateDiary(selectedDate,
+                      FirebaseAuth.instance.currentUser!.uid, isDescend),
                   initialData: [],
                   builder: (_, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting)
@@ -54,13 +58,17 @@ class DiaryListView extends StatelessWidget {
                             itemCount: filteredDiaryList.length,
                             itemBuilder: (_, i) {
                               final diary = filteredDiaryList[i];
-                              return Card(
-                                elevation: 4,
-                                child: InnerListCard(
-                                    // selectedDate: this.selectedDate,
-                                    diary: diary,
-                                    bookCollectionReference:
-                                        bookCollectionReference),
+                              return DelayedDisplay(
+                                delay: const Duration(milliseconds: 2),
+                                fadeIn: true,
+                                child: Card(
+                                  elevation: 4,
+                                  child: InnerListCard(
+                                      // selectedDate: this.selectedDate,
+                                      diary: diary,
+                                      bookCollectionReference:
+                                          bookCollectionReference),
+                                ),
                               );
                             })
                         : ListView.builder(

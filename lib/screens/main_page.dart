@@ -19,7 +19,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  String? _dropDownText;
+  String? _dropDownText = 'Latest';
   DateTime? selectedDate; // = DateTime.now();
   var userDiaryFilterEntriesList;
   // final _listOfDiaries = <Diary>[]
@@ -38,9 +38,12 @@ class _MainPageState extends State<MainPage> {
     //                 .isAfter(diary.entryTime.toDate()) &&
     //             selectedDate!.isBefore(diary.entryTime.toDate()))
     //     .toList();
+
+    //just to used listening any change in diaries
     final _listOfDiaries = Provider.of<List<Diary>>(context);
     final _titleTextController = TextEditingController();
     final _descriptionTextController = TextEditingController();
+    // final _user = context.read<User?>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
@@ -79,7 +82,30 @@ class _MainPageState extends State<MainPage> {
                   onChanged: (value) {
                     setState(() {
                       _dropDownText = value.toString();
+                      globalVar.isDescend = value == 'Latest';
                     });
+                    // if (value == 'Latest') {
+                    //   _listOfDiaries.clear();
+                    //   var latestFilterDiariesStream = DiaryService()
+                    //       .getLatestDiaries(_user!.uid)
+                    //       .then((items) {
+                    //     for (var item in items) {
+                    //       _listOfDiaries.add(item);
+                    //     }
+                    //     setState(() {});
+                    //   });
+                    // }
+                    // if (value == 'Earliest') {
+                    //   _listOfDiaries.clear();
+                    //   var earliestFilterDiariesStream = DiaryService()
+                    //       .getEarliestDiaries(_user!.uid)
+                    //       .then((items) {
+                    //     for (var item in items) {
+                    //       _listOfDiaries.add(item);
+                    //     }
+                    //     setState(() {});
+                    //   });
+                    // }
                   },
                 ),
               ),
