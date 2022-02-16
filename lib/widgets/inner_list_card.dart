@@ -149,7 +149,6 @@ class InnerListCard extends StatelessWidget {
                                     linkReference: bookCollectionReference,
                                   ),
                                 );
-                                // Navigator.of(context).pop();
                               },
                             ),
                             IconButton(

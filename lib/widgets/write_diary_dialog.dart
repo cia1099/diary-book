@@ -7,14 +7,15 @@ import 'package:intl/intl.dart';
 import 'package:mime_type/mime_type.dart';
 import 'dart:html' as html;
 import 'package:path/path.dart' as Path;
+import 'package:provider/src/provider.dart';
 
 import 'package:web_practice/model/diary.dart';
+import 'package:web_practice/model/global.dart';
 import 'package:web_practice/model/user.dart';
 
 class WriteDiaryDialog extends StatefulWidget {
   const WriteDiaryDialog({
     Key? key,
-    required this.selectedDate,
     required TextEditingController titleTextController,
     required TextEditingController descriptionTextController,
   })  : _titleTextController = titleTextController,
@@ -23,7 +24,6 @@ class WriteDiaryDialog extends StatefulWidget {
 
   final TextEditingController _titleTextController;
   final TextEditingController _descriptionTextController;
-  final DateTime selectedDate;
 
   @override
   State<WriteDiaryDialog> createState() => _WriteDiaryDialogState();
@@ -39,6 +39,8 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedDate =
+        context.read<GlobalVariable>().selectedTime ?? DateTime.now();
     return AlertDialog(
       elevation: 5,
       content: Container(
@@ -94,21 +96,13 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                                         widget._descriptionTextController.text,
                                     author:
                                         await user.then((value) => value.name),
-                                    // author: FirebaseAuth
-                                    //     .instance.currentUser!.email!
-                                    //     .split('@')[0],
                                     userId:
                                         await user.then((value) => value.uid),
-                                    // userId:
-                                    //     FirebaseAuth.instance.currentUser!.uid,
                                     photoUrls: '',
-                                    entryTime:
-                                        Timestamp.fromDate(widget.selectedDate))
+                                    entryTime: Timestamp.fromDate(selectedDate))
                                 .toMap())
                             .then((value) {
-                          // setState(() {
                           docId = value.id;
-                          // });
                           return null;
                         });
                       }
@@ -131,7 +125,7 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                       setState(() {
                         _buttonText = 'Saving...';
                       });
-                      Future.delayed(Duration(milliseconds: 2500))
+                      Future.delayed(Duration(milliseconds: 800))
                           .then((value) => Navigator.of(context).pop());
                     },
                   ),
@@ -168,8 +162,7 @@ class _WriteDiaryDialogState extends State<WriteDiaryDialog> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                                DateFormat.yMMMd().format(widget.selectedDate)),
+                            Text(DateFormat.yMMMd().format(selectedDate)),
                             SizedBox(
                               width: MediaQuery.of(context).size.width * 0.5,
                               child: Form(

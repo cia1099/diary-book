@@ -71,7 +71,6 @@ class _UpdateEntryDialogState extends State<UpdateEntryDialog> {
                       ),
                     ),
                     onPressed: () async {
-                      // final user = FirebaseAuth.instance.currentUser!;
                       final user = FirebaseFirestore.instance
                           .collection('users')
                           .where('uid',

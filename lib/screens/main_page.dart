@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+import 'package:tuple/tuple.dart';
 import 'package:web_practice/model/diary.dart';
 import 'package:web_practice/model/global.dart';
 import 'package:web_practice/model/user.dart';
@@ -12,38 +13,21 @@ import 'package:web_practice/widgets/diary_list_view.dart';
 import 'package:web_practice/widgets/write_diary_dialog.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+  MainPage({Key? key}) : super(key: key);
 
   @override
   State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  String? _dropDownText = 'Latest';
-  DateTime? selectedDate; // = DateTime.now();
-  var userDiaryFilterEntriesList;
-  // final _listOfDiaries = <Diary>[]
-
   @override
   Widget build(BuildContext context) {
     final globalVar = context.read<GlobalVariable>();
-    var selectedDate = globalVar.selectedTime;
-
-    // final _listOfDiaries = context
-    //     .watch<List<Diary>>()
-    //     .where((diary) => selectedDate == null
-    //         ? DateTime.now().isAfter(diary.entryTime.toDate())
-    //         : selectedDate!
-    //                 .add(const Duration(days: 1))
-    //                 .isAfter(diary.entryTime.toDate()) &&
-    //             selectedDate!.isBefore(diary.entryTime.toDate()))
-    //     .toList();
-
-    //just to used listening any change in diaries
-    final _listOfDiaries = Provider.of<List<Diary>>(context);
+    DateTime? selectedDate = globalVar.selectedTime;
+    String? _dropDownText = globalVar.isDescend ? 'Latest' : 'Earliest';
     final _titleTextController = TextEditingController();
     final _descriptionTextController = TextEditingController();
-    // final _user = context.read<User?>();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey.shade100,
@@ -66,47 +50,26 @@ class _MainPageState extends State<MainPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: DropdownButton(
-                  items: const ['Latest', 'Earliest']
-                      .map((item) => DropdownMenuItem(
-                            child: Text(
-                              item,
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            value: item,
-                          ))
-                      .toList(),
-                  hint: _dropDownText == null
-                      ? const Text('Select')
-                      : Text(_dropDownText!),
-                  onChanged: (value) {
-                    setState(() {
+                child: Selector<GlobalVariable, bool>(
+                  selector: (_, provider) => provider.isDescend,
+                  builder: (_, isDescend, __) => DropdownButton(
+                    items: const ['Latest', 'Earliest']
+                        .map((item) => DropdownMenuItem(
+                              child: Text(
+                                item,
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                              value: item,
+                            ))
+                        .toList(),
+                    hint: _dropDownText == null
+                        ? const Text('Select')
+                        : Text(_dropDownText!),
+                    onChanged: (value) {
                       _dropDownText = value.toString();
-                      globalVar.isDescend = value == 'Latest';
-                    });
-                    // if (value == 'Latest') {
-                    //   _listOfDiaries.clear();
-                    //   var latestFilterDiariesStream = DiaryService()
-                    //       .getLatestDiaries(_user!.uid)
-                    //       .then((items) {
-                    //     for (var item in items) {
-                    //       _listOfDiaries.add(item);
-                    //     }
-                    //     setState(() {});
-                    //   });
-                    // }
-                    // if (value == 'Earliest') {
-                    //   _listOfDiaries.clear();
-                    //   var earliestFilterDiariesStream = DiaryService()
-                    //       .getEarliestDiaries(_user!.uid)
-                    //       .then((items) {
-                    //     for (var item in items) {
-                    //       _listOfDiaries.add(item);
-                    //     }
-                    //     setState(() {});
-                    //   });
-                    // }
-                  },
+                      globalVar.isDescend = value.toString() == 'Latest';
+                    },
+                  ),
                 ),
               ),
               //TODO: create profile
@@ -149,26 +112,8 @@ class _MainPageState extends State<MainPage> {
                         initialSelectedDate: selectedDate,
                         toggleDaySelection: true,
                         onSelectionChanged: (dateRangePickerSelection) {
-                          setState(() {
-                            // selectedDate = dateRangePickerSelection.value;
-                            globalVar.selectedTime =
-                                dateRangePickerSelection.value;
-                            // if (selectedDate != null) {
-                            //   _listOfDiaries.clear();
-                            //   userDiaryFilterEntriesList = DiaryService()
-                            //       .getSameDateDiary(
-                            //           Timestamp.fromDate(selectedDate!)
-                            //               .toDate(),
-                            //           FirebaseAuth.instance.currentUser!.uid)
-                            //       .then((items) {
-                            //     for (var element in items) {
-                            //       _listOfDiaries.add(element);
-                            //     }
-                            //     setState(() {});
-                            //   });
-                            // }
-                          });
-                          // print(dateRangePickerSelection.value.toString());
+                          globalVar.selectedTime =
+                              dateRangePickerSelection.value;
                         },
                       ),
                     ),
@@ -193,7 +138,6 @@ class _MainPageState extends State<MainPage> {
                             onPressed: () => showDialog(
                               context: context,
                               builder: (context) => WriteDiaryDialog(
-                                  selectedDate: selectedDate ?? DateTime.now(),
                                   titleTextController: _titleTextController,
                                   descriptionTextController:
                                       _descriptionTextController),
@@ -207,17 +151,15 @@ class _MainPageState extends State<MainPage> {
                 ),
               )),
           Expanded(
-              flex: 3,
-              child: DiaryListView(
-                selectedDate: selectedDate,
-              )),
+            flex: 3,
+            child: DiaryListView(),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showDialog(
             context: context,
             builder: (context) => WriteDiaryDialog(
-                selectedDate: selectedDate ?? DateTime.now(),
                 titleTextController: _titleTextController,
                 descriptionTextController: _descriptionTextController)),
         tooltip: 'Add',

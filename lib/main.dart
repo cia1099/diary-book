@@ -46,7 +46,8 @@ class MyApp extends StatelessWidget {
             initialData: null),
         StreamProvider<List<Diary>>(
             create: (context) => userDiaryDataStream, initialData: []),
-        Provider<GlobalVariable>(create: (context) => GlobalVariable()),
+        ChangeNotifierProvider<GlobalVariable>(
+            create: (context) => GlobalVariable()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -89,32 +90,5 @@ class RouteController extends StatelessWidget {
       return MainPage();
     else
       return PageNotFound();
-  }
-}
-
-class GetInfo extends StatelessWidget {
-  const GetInfo({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('diaries').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Something went wrong'));
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator.adaptive());
-          }
-          return Material(
-            child: ListView(
-                children: snapshot.data!.docs
-                    .map((DocumentSnapshot doc) => ListTile(
-                          title: Text(doc.get('display_name')),
-                          subtitle: Text(doc.get('profession')),
-                        ))
-                    .toList()),
-          );
-        });
   }
 }

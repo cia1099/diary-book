@@ -1,10 +1,6 @@
-import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart';
 
-class GlobalVariable /*with ChangeNotifier*/ {
-  /**
-   * with ChangeNotifier which have not belong null varialble
-   */
+class GlobalVariable with ChangeNotifier {
   GlobalVariable({DateTime? selectedTime}) : _selectedTime = selectedTime;
   DateTime? _selectedTime;
   bool _isDescend = true;
@@ -13,13 +9,13 @@ class GlobalVariable /*with ChangeNotifier*/ {
   // ignore: unnecessary_getters_setters
   set selectedTime(DateTime? time) {
     _selectedTime = time;
-    // notifyListeners();
+    notifyListeners();
   }
 
   bool get isDescend => _isDescend;
   // ignore: unnecessary_getters_setters
   set isDescend(bool val) {
     _isDescend = val;
-    // notifyListeners();
+    notifyListeners();
   }
 }
