@@ -38,8 +38,11 @@ class GettingStartPage extends StatelessWidget {
               icon: Icon(Icons.login_rounded),
               label: Text('Sign in to Get Started'),
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginPage()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        settings: RouteSettings(name: '/login'),
+                        builder: (context) => LoginPage()));
               },
             ),
           ),

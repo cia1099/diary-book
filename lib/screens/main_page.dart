@@ -14,6 +14,7 @@ import 'package:web_practice/widgets/write_diary_dialog.dart';
 
 class MainPage extends StatefulWidget {
   MainPage({Key? key}) : super(key: key);
+  static String routeName = '/main';
 
   @override
   State<MainPage> createState() => _MainPageState();

@@ -159,11 +159,14 @@ class _UpdateEntryDialogState extends State<UpdateEntryDialog> {
                                   );
                                   if (isDeleted) {
                                     //TODO: fuck push to page which would decrease perfomance
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => MainPage(),
-                                        ));
+                                    // Navigator.pushReplacement(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //       builder: (context) => MainPage(),
+                                    //     ));
+                                    Navigator.of(context).popUntil(
+                                        ModalRoute.withName(
+                                            MainPage.routeName));
                                   }
                                 },
                                 splashRadius: 26,

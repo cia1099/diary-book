@@ -50,11 +50,15 @@ class CreateProfile extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                FirebaseAuth.instance.signOut().then((value) => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginPage(),
-                    )));
+                FirebaseAuth.instance
+                    .signOut()
+                    .then((value) => Navigator.pushReplacementNamed(
+                        context,
+                        // MaterialPageRoute(
+                        //   settings: RouteSettings(name: '/login'),
+                        //   builder: (context) => LoginPage(),
+                        // )
+                        '/login'));
               },
               icon: const Icon(
                 Icons.logout_outlined,

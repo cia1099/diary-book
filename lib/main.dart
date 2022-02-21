@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/',
         onGenerateRoute: (settings) => MaterialPageRoute(
+          settings: settings,
           builder: (context) => RouteController(settingName: settings.name!),
         ),
         onUnknownRoute: (settings) => MaterialPageRoute(

@@ -69,8 +69,11 @@ class LoginForm extends StatelessWidget {
                       .signInWithEmailAndPassword(
                           email: _emailTextController.text,
                           password: _passwordTextController.text)
-                      .then((value) => Navigator.push(context,
-                          MaterialPageRoute(builder: (ctx) => MainPage())));
+                      .then((value) => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              settings: RouteSettings(name: MainPage.routeName),
+                              builder: (ctx) => MainPage())));
                 }
               },
               child: Text('Sign In'))
