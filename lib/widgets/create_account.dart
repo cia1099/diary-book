@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:web_practice/model/user.dart';
 import 'package:web_practice/screens/main_page.dart';
 import 'package:web_practice/services/service.dart';
@@ -8,11 +10,12 @@ import 'package:web_practice/services/service.dart';
 import 'input_decorator.dart';
 
 class CreateAccountForm extends StatelessWidget {
-  const CreateAccountForm({
+  CreateAccountForm({
     Key? key,
     required TextEditingController emailTextController,
     required TextEditingController passwordTextController,
     GlobalKey<FormState>? formKey,
+    required this.ctx,
   })  : _emailTextController = emailTextController,
         _passwordTextController = passwordTextController,
         _globalKey = formKey,
@@ -21,6 +24,9 @@ class CreateAccountForm extends StatelessWidget {
   final TextEditingController _emailTextController;
   final TextEditingController _passwordTextController;
   final GlobalKey<FormState>? _globalKey;
+  final _passwordFocusNode = FocusNode();
+  final _createFocusNode = FocusNode();
+  final BuildContext ctx;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +45,9 @@ class CreateAccountForm extends StatelessWidget {
               },
               controller: _emailTextController,
               decoration: buildInputDecoration('email', 'john@gmail.com'),
+              textInputAction: TextInputAction.next,
+              onFieldSubmitted: (_) =>
+                  FocusScope.of(context).requestFocus(_passwordFocusNode),
             ),
           ),
           SizedBox(
@@ -53,12 +62,17 @@ class CreateAccountForm extends StatelessWidget {
               obscureText: true,
               controller: _passwordTextController,
               decoration: buildInputDecoration('password', ''),
+              textInputAction: TextInputAction.next,
+              focusNode: _passwordFocusNode,
+              onFieldSubmitted: (_) =>
+                  FocusScope.of(context).requestFocus(_createFocusNode),
             ),
           ),
           SizedBox(
             height: 20,
           ),
           TextButton(
+              focusNode: _createFocusNode,
               style: TextButton.styleFrom(
                   primary: Colors.white,
                   padding: EdgeInsets.all(15),
@@ -88,6 +102,15 @@ class CreateAccountForm extends StatelessWidget {
                                 )));
                       });
                     }
+                  }).onError<FirebaseAuthException>((error, _) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+                        content: Text(
+                      error.message!,
+                      style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 20,
+                      ),
+                    )));
                   });
                 }
               },

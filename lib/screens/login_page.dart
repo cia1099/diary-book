@@ -17,9 +17,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Container(
-        child: Column(
+    return Scaffold(
+      body: Builder(
+        builder: (context) => Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -42,10 +42,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: isCreatedAccountClicked
                         ? CreateAccountForm(
                             formKey: _globalKey,
+                            ctx: context,
                             emailTextController: _emailTextController,
                             passwordTextController: _passwordTextController)
                         : LoginForm(
                             formKey: _globalKey,
+                            ctx: context,
                             emailTextController: _emailTextController,
                             passwordTextController: _passwordTextController)),
                 TextButton.icon(

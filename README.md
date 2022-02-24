@@ -200,6 +200,9 @@ initState(){
 ###### 5-5 Using the LayoutBuilder Widget
 MediaQuery的另一種選擇，找到widget在tree裡面的屬於哪個Container的child，這個widget就會以這外層定義的範圍作constraints，之後在builder參數就可以引用這個constraints來定義版面。在找外層容器可以用devTool來查找。
 
+###### 11-7 Handling Authentication Errors & 14-12 Implementing Authentication
+Handle Error in credentials that are good examples
+
 
 
 
