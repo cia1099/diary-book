@@ -203,6 +203,79 @@ MediaQuery的另一種選擇，找到widget在tree裡面的屬於哪個Container
 ###### 11-7 Handling Authentication Errors & 14-12 Implementing Authentication
 Handle Error in credentials that are good examples
 
+## Use Broswer to keep mobile layout
+* 模擬手機寬度，最基礎的就是在Scaffold Widget外層套 Container 將Scaffold畫面置中，然後用SizedBox來限制寬度：
+```dart
+return Container(
+      alignment: Alignment.center,
+      child: SizedBox(
+        width: 400, //desire width
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+          ),
+          body: Center(
+              //...
+          ),
+        ),//Scaffold
+      ),//SizedBox
+    );//Container
+```
+注意這招一定要作用在Scaffold的外層地方，用在MaterialApp沒有用，因為那是用來定義版型、樣式的地方。可以在MaterialApp的attribute加入`debugShowCheckedModeBanner: false`不顯示debug紅緞帶。
+
+* 如果要限制高度(避免視窗縮得過小)，要搭配LayoutBuilder和Scrollbar，來針對目前視窗大小來進行限制：
+```dart
+@override
+  Widget build(BuildContext context) {
+    final _verticalController = ScrollController();
+    const minHeight = 500;//desire height
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.minHeight < minHeight) {
+          return Scrollbar(
+            controller: _verticalController,
+            child: SingleChildScrollView(
+              controller: _verticalController,
+              scrollDirection: Axis.vertical,
+              child: Container(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 400,
+                  height: minHeight.toDouble(),//在Scrollbar裡限制高度，當視窗過小的時候才需要加入
+                  child: Scaffold(
+                    appBar: AppBar(
+                      title: Text(widget.title),
+                    ),
+                    body: Center(
+                        //...
+                    ),
+                  ),
+                ),
+              ),
+            ),//SingleChildScrollView
+          );//Scrollbar
+        } else {
+          return Container(
+            alignment: Alignment.center,
+            child: SizedBox(
+              width: 400,
+              child: Scaffold(
+                appBar: AppBar(
+                  title: Text(widget.title),
+                ),
+                body: Center(
+                    //...
+                ),
+              ),
+            ),
+          );
+        }
+      },
+    );//LayoutBuilder
+  }
+```
+[參考資料](https://stackoverflow.com/questions/67461431/how-to-constraints-width-and-height-of-scaffold-useful-for-web-and-desktop)有水平、垂直兩個方向的優化，這裡只對垂直方向作優化。因為瀏覽器視窗縮不到小於500的寬度，這裡就不對水平方向優化了。
+
 
 
 
